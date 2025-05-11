@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  .login-box {
+    width: 100%;
+    max-width: 360px;
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .login-box h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: var(--text);
+    font-size: 1.75rem;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="password"] {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color .2s;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .error-box {
+    background: #fdecea;
+    color: #b71c1c;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  .form-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .form-info a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .form-info a:hover {
+    text-decoration: underline;
+  }
+  .btn-submit {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background .2s;
+    cursor: pointer;
+  }
+  .btn-submit:hover {
+    background: #1d6f6f; /* slightly darker */
+  }
+</style>
+
+<div class="login-container">
+  <div class="login-box">
+    <h2>Welcome Back</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="error-box">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="id_username">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          required
+          autofocus
+          placeholder="Enter your username"
+        >
+        {% if form.username.errors %}
+          <div class="error-box">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="id_password"
+          required
+          placeholder="Enter your password"
+        >
+        {% if form.password.errors %}
+          <div class="error-box">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-info">
+        <label>
+          <input type="checkbox" name="remember"> Remember me
+        </label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-submit">Log In</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

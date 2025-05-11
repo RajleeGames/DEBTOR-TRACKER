@@ -1,0 +1,56 @@
+# Python cache files
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+.env
+
+# Django related
+db.sqlite3
+*.log
+
+# Django secret key or environment variables
+.env
+*.env
+
+# Static files
+staticfiles/
+static/
+media/
+
+# VS Code
+.vscode/
+
+# Windows related
+Thumbs.db
+desktop.ini
+
+# macOS related
+.DS_Store
+
+# Pytest cache
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Pylint
+.pylint.d/
+
+# Coverage
+htmlcov/
+.coverage
+*.cover
+*.coverage.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Node modules
+node_modules/

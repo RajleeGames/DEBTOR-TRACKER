@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Debtor Tracker{% endblock %}</title>
+  <style>
+    :root {
+      --bg-light: #f7fafc;   --surface-light: #fff;   --text-light: #2d3748;   --primary-light: #2c7a7b;
+      --bg-dark:  #1a202c;    --surface-dark: #2d3748;  --text-dark:  #e2e8f0;   --primary-dark:  #4fd1c5;
+    }
+    [data-theme="light"] {
+      --bg: var(--bg-light); --surface: var(--surface-light);
+      --text: var(--text-light); --primary: var(--primary-light);
+    }
+    [data-theme="dark"] {
+      --bg: var(--bg-dark);  --surface: var(--surface-dark);
+      --text: var(--text-dark);  --primary: var(--primary-dark);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--primary); }
+    header { background: var(--surface); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+    }
+    .navbar .brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-center a {
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+    }
+    .datetime {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+    .profile-link {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .profile-link img {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+    .profile-link span {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+    }
+    footer {
+      background: var(--surface);
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #666;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .btn:hover { opacity: 0.9; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <header>
+    <div class="navbar">
+      <!-- Left: Brand -->
+      <a href="{% url 'debtor_list' %}" class="brand">DebtorTracker</a>
+
+      <!-- Center: Nav links + Date/Time -->
+      <div class="nav-center">
+        <a href="{% url 'debtor_list' %}">Debtors</a>
+        <div class="datetime" id="datetime">--:-- --, --- -- ----</div>
+      </div>
+
+      <!-- Right: Profile, Logout, Theme -->
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="profile-link">
+            <img src="{{ user.profile.avatar.url|default:'/static/default-avatar.png' }}" alt="{{ user.username }}">
+            <span>{{ user.username }}</span>
+          </a>
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background:#e53e3e;">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    &copy; 2025 DebtorTracker
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function(){
+      const t = document.getElementById('themeToggle'),
+            r = document.documentElement;
+      t.addEventListener('click', ()=>{
+        const next = r.dataset.theme==='light' ? 'dark':'light';
+        r.dataset.theme = next;
+        localStorage.theme = next;
+      });
+      document.addEventListener('DOMContentLoaded', ()=>{
+        r.dataset.theme = localStorage.theme || 'light';
+      });
+    })();
+
+    // Date/Time once
+    (function(){
+      const el = document.getElementById('datetime'),
+            now = new Date(),
+            opts = { hour:'2-digit', minute:'2-digit', weekday:'short', month:'short', day:'numeric' };
+      el.textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
+                       ' — ' + now.toLocaleDateString([], opts);
+    })();
+  </script>
+</body>
+</html>

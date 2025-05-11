@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Deletion{% endblock %}
+
+{% block content %}
+<style>
+  .confirm-container {
+    max-width: 400px;
+    margin: 5rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  .confirm-container h2 {
+    color: #C00;
+    margin-bottom: 1rem;
+  }
+  .confirm-container p {
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  .confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background .2s;
+    color: #fff;
+  }
+  .btn-danger {
+    background: #E57373;
+  }
+  .btn-danger:hover {
+    background: #EF5350;
+  }
+  .btn-cancel {
+    background: #AAA;
+  }
+  .btn-cancel:hover {
+    background: #888;
+  }
+</style>
+
+<div class="confirm-container">
+  <h2>Are you sure?</h2>
+  <p>You’re about to delete “<strong>{{ object }}</strong>”. This cannot be undone.</p>
+  <form method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+  </form>
+  <a href="{{ cancel_url }}" class="btn btn-cancel">Cancel</a>
+</div>
+{% endblock %}

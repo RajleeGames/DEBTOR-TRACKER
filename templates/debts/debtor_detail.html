@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block title %}{{ debtor.name }} • Profile{% endblock %}
+{% block header %}Debtor Profile{% endblock %}
+
+{% block content %}
+<style>
+  /* Container */
+  .profile-section {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: Arial, sans-serif;
+  }
+  /* Section headers */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .section-header h2,
+  .section-header h3 {
+    margin: 0;
+    color: #333;
+  }
+  .section-header .btn {
+    padding: 0.4rem 0.8rem;
+    background: #4A90E2;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+  .section-header .btn:hover {
+    background: #357ABD;
+  }
+
+  /* Overview grid */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .overview-grid dt {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+  }
+  .overview-grid dd {
+    margin: 0.25rem 0 0;
+    font-size: 1.1rem;
+    color: #222;
+  }
+  .overview-grid dd.balance {
+    color: #4A90E2;
+    font-weight: bold;
+  }
+
+  /* Table wrapper */
+  .table-container {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead th {
+    text-align: left;
+    padding: 0.75rem;
+    background: #f5f5f5;
+    color: #555;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+  }
+  tbody td {
+    padding: 0.75rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+  }
+  tbody tr:hover {
+    background: #fafafa;
+  }
+  .no-data td {
+    text-align: center;
+    padding: 1.5rem;
+    color: #888;
+  }
+
+  /* Action buttons */
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.3rem;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .action-edit {
+    background: #FFA726;
+  }
+  .action-edit:hover {
+    background: #FB8C00;
+  }
+  .action-delete {
+    background: #E57373;
+  }
+  .action-delete:hover {
+    background: #EF5350;
+  }
+  .actions-cell {
+    white-space: nowrap;
+    text-align: right;
+  }
+</style>
+
+<div class="profile-section">
+  <!-- Overview -->
+  <section aria-labelledby="overview-heading">
+    <div class="section-header">
+      <h2 id="overview-heading">{{ debtor.name }}</h2>
+      <div>
+        <a href="{% url 'debtor_edit' debtor.pk %}" class="btn">Edit Debtor</a>
+        <a href="{% url 'debtor_delete' debtor.pk %}" class="btn"
+           onclick="return confirm('Delete this debtor?');">Delete Debtor</a>
+        <a href="{% url 'transaction_add' debtor.pk %}" class="btn">+ Transaction</a>
+      </div>
+    </div>
+    <dl class="overview-grid">
+      <div>
+        <dt>Current Balance</dt>
+        <dd class="balance">Tsh{{ debtor.balance|floatformat:2 }}</dd>
+      </div>
+      <div>
+        <dt>Phone Number</dt>
+        <dd>{{ debtor.phone|default:"—" }}</dd>
+      </div>
+      <div>
+        <dt>Account Opened</dt>
+        <dd>{{ debtor.created|date:"M d, Y" }}</dd>
+      </div>
+      <div>
+        <dt>Total Transactions</dt>
+        <dd>{{ debtor.transactions.count }} entries</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- Transaction History -->
+  <section aria-labelledby="history-heading">
+    <div class="section-header">
+      <h3 id="history-heading">Transaction History</h3>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th style="text-align:right;">Amount</th>
+            <th>Note</th>
+            <th class="actions-cell">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in txs %}
+            <tr>
+              <td>{{ tx.timestamp|date:"Y-m-d H:i" }}</td>
+              <td>{{ tx.get_kind_display }}</td>
+              <td style="text-align:right; font-family:monospace;">
+                Tsh{{ tx.amount|floatformat:2 }}
+              </td>
+              <td>{{ tx.note|default:"—" }}</td>
+              <td class="actions-cell">
+                <a href="{% url 'transaction_edit' debtor.pk tx.pk %}" class="action-btn action-edit">Edit</a>
+                <a href="{% url 'transaction_delete' debtor.pk tx.pk %}" class="action-btn action-delete"
+                   onclick="return confirm('Delete this transaction?');">Delete</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr class="no-data">
+              <td colspan="5">No transactions recorded.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

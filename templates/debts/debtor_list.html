@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}All Debtors{% endblock %}
+{% block header %}All Debtors{% endblock %}
+
+{% block content %}
+<style>
+  section[aria-labelledby="debtors-heading"] {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: Arial, sans-serif;
+  }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .header-row h2 {
+    font-size: 1.75rem;
+    color: #333;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background: #4A90E2;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background .2s;
+  }
+  .btn:hover { background: #357ABD; }
+
+  .summary {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .card {
+    flex: 1;
+    min-width: 180px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 1rem;
+    text-align: center;
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+  .card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c7a7b;
+  }
+
+  .search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .search-form input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  .search-form input:focus {
+    outline: none;
+    border-color: #4A90E2;
+  }
+
+  .debtor-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #EEE;
+  }
+  .debtor-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #EEE;
+    transition: background .2s;
+  }
+  .debtor-list li:hover { background: #F9F9F9; }
+  .debtor-list a {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+  .debtor-name { font-weight: 500; color: #4A90E2; }
+  .debtor-balance { font-size: 0.9rem; color: #666; }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem 0;
+    color: #888;
+  }
+  .empty-state a {
+    color: #4A90E2;
+    text-decoration: none;
+  }
+  .empty-state a:hover { text-decoration: underline; }
+</style>
+
+<section aria-labelledby="debtors-heading">
+  <div class="header-row">
+    <h2 id="debtors-heading">Debtor Directory</h2>
+    <a href="{% url 'debtor_add' %}" class="btn">+ New Debtor</a>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary">
+    <!-- Total Owed -->
+    <div class="card">
+      <h3>Total Owed</h3>
+      <p>Tsh{{ total_balance|floatformat:2 }}</p>
+    </div>
+
+    <!-- Highest Owed -->
+    <div class="card">
+      <h3>Highest Owed</h3>
+      {% if highest_debtor %}
+        <p>{{ highest_debtor.name }}<br/>Tsh{{ highest_debtor.computed_balance|floatformat:2 }}</p>
+      {% else %}
+        <p>—</p>
+      {% endif %}
+    </div>
+
+    <!-- Lowest Owed -->
+    <div class="card">
+      <h3>Lowest Owed</h3>
+      {% if lowest_debtor %}
+        <p>{{ lowest_debtor.name }}<br/>Tsh{{ lowest_debtor.computed_balance|floatformat:2 }}</p>
+      {% else %}
+        <p>—</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <form method="get" class="search-form" id="searchForm">
+    <input
+      type="text"
+      name="q"
+      id="searchInput"
+      value="{{ q }}"
+      placeholder="Search by name…"
+    >
+    <button type="submit" class="btn">Search</button>
+  </form>
+
+  <!-- Debtor List -->
+  <ul class="debtor-list">
+    {% for d in debtors %}
+      <li>
+        <a href="{% url 'debtor_detail' d.pk %}">
+          <span class="debtor-name">{{ d.name }}</span>
+          <span class="debtor-balance">Tsh{{ d.computed_balance|floatformat:2 }}</span>
+        </a>
+      </li>
+    {% empty %}
+      <li class="empty-state">
+        No debtors found. <a href="{% url 'debtor_add' %}">Add one now</a>.
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<script>
+  document.getElementById('searchInput').addEventListener('input', function(){
+    if (!this.value.trim()) {
+      window.location = window.location.pathname;
+    }
+  });
+</script>
+{% endblock %}
