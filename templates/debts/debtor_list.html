@@ -4,58 +4,86 @@
 
 {% block content %}
 <style>
+  :root {
+    --bg-light: #f0f4f8;
+    --card-bg: #fff;
+    --primary: #4a90e2;
+    --accent: #50e3c2;
+    --text-dark: #333;
+    --text-light: #777;
+    --radius: 8px;
+    --gap: 1rem;
+    --transition: 0.3s;
+  }
+
   section[aria-labelledby="debtors-heading"] {
-    max-width: 900px;
+    max-width: 960px;
     margin: 2rem auto;
     padding: 0 1rem;
-    font-family: Arial, sans-serif;
+    background: var(--bg-light);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
   }
+
   .header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    padding: var(--gap) 0;
   }
   .header-row h2 {
-    font-size: 1.75rem;
-    color: #333;
+    font-size: 2rem;
+    color: var(--text-dark);
+    letter-spacing: 0.5px;
   }
+
   .btn {
-    display: inline-block;
-    padding: 0.6rem 1.2rem;
-    background: #4A90E2;
+    background: var(--primary);
     color: #fff;
-    border-radius: 4px;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background var(--transition);
     text-decoration: none;
-    font-size: 0.95rem;
-    transition: background .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
   }
-  .btn:hover { background: #357ABD; }
+  .btn:hover {
+    background: #357ABD;
+  }
 
   .summary {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--gap);
     margin-bottom: 2rem;
   }
   .card {
-    flex: 1;
-    min-width: 180px;
-    background: #fff;
-    border-radius: 6px;
+    background: var(--card-bg);
+    padding: var(--gap);
+    border-radius: var(--radius);
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 1rem;
     text-align: center;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   }
   .card h3 {
-    font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    color: #555;
+    font-size: 1.1rem;
+    color: var(--text-light);
   }
   .card p {
     font-size: 1.5rem;
-    font-weight: bold;
-    color: #2c7a7b;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
   }
 
   .search-form {
@@ -65,31 +93,37 @@
   }
   .search-form input[type="text"] {
     flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #CCC;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: border-color var(--transition);
   }
-  .search-form input:focus {
+  .search-form input[type="text"]:focus {
     outline: none;
-    border-color: #4A90E2;
+    border-color: var(--accent);
+  }
+  .search-form button {
+    padding: 0 1rem;
   }
 
   .debtor-list {
     list-style: none;
-    padding: 0;
     margin: 0;
-    border-top: 1px solid #EEE;
+    padding: 0;
+    border-top: 1px solid #ddd;
   }
   .debtor-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #EEE;
-    transition: background .2s;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+    transition: background var(--transition);
   }
-  .debtor-list li:hover { background: #F9F9F9; }
+  .debtor-list li:hover {
+    background: #fafcff;
+  }
   .debtor-list a {
     display: flex;
     justify-content: space-between;
@@ -97,36 +131,42 @@
     text-decoration: none;
     color: inherit;
   }
-  .debtor-name { font-weight: 500; color: #4A90E2; }
-  .debtor-balance { font-size: 0.9rem; color: #666; }
+  .debtor-name {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.1rem;
+  }
+  .debtor-balance {
+    font-size: 1rem;
+    color: var(--text-light);
+  }
 
   .empty-state {
     text-align: center;
     padding: 2rem 0;
-    color: #888;
+    color: var(--text-light);
   }
   .empty-state a {
-    color: #4A90E2;
+    color: var(--accent);
     text-decoration: none;
   }
-  .empty-state a:hover { text-decoration: underline; }
+  .empty-state a:hover {
+    text-decoration: underline;
+  }
 </style>
 
 <section aria-labelledby="debtors-heading">
   <div class="header-row">
     <h2 id="debtors-heading">Debtor Directory</h2>
-    <a href="{% url 'debtor_add' %}" class="btn">+ New Debtor</a>
+    <a href="{% url 'debtor_add' %}" class="btn">➕ New Debtor</a>
   </div>
 
   <!-- Summary Cards -->
   <div class="summary">
-    <!-- Total Owed -->
     <div class="card">
       <h3>Total Owed</h3>
       <p>Tsh{{ total_balance|floatformat:2 }}</p>
     </div>
-
-    <!-- Highest Owed -->
     <div class="card">
       <h3>Highest Owed</h3>
       {% if highest_debtor %}
@@ -135,8 +175,6 @@
         <p>—</p>
       {% endif %}
     </div>
-
-    <!-- Lowest Owed -->
     <div class="card">
       <h3>Lowest Owed</h3>
       {% if lowest_debtor %}
@@ -149,13 +187,7 @@
 
   <!-- Search Form -->
   <form method="get" class="search-form" id="searchForm">
-    <input
-      type="text"
-      name="q"
-      id="searchInput"
-      value="{{ q }}"
-      placeholder="Search by name…"
-    >
+    <input type="text" name="q" id="searchInput" value="{{ q }}" placeholder="Search by name…" />
     <button type="submit" class="btn">Search</button>
   </form>
 
@@ -177,7 +209,7 @@
 </section>
 
 <script>
-  document.getElementById('searchInput').addEventListener('input', function(){
+  document.getElementById('searchInput').addEventListener('input', function() {
     if (!this.value.trim()) {
       window.location = window.location.pathname;
     }
